@@ -1,0 +1,14 @@
+# Part B.5 — The trade-off register
+
+One entry per ADR. Every entry names a victim.
+
+| # | Decision | Makes better | Makes worse | Who feels it |
+|---|---|---|---|---|
+| ADR-001 | Pre-materialized static read tier | Results-day read cost and latency, at flat cost | Freshness of results-day reads — a late correction isn't visible until the next refresh | The Head of Operations, and any candidate whose result was corrected in the hour before or during release |
+| ADR-002 | Append-only versioned results | Regulator's 50-year reproducibility and amendment traceability | Storage footprint (every version kept); no retroactive rewrite of a result an employer already verified | The Head of Operations, whose "everywhere immediately" request is only partially honoured |
+| ADR-003 | PostgreSQL as primary | Team can build and operate it confidently in 9 months; strong fit for join/aggregate query shapes | No horizontal write-scaling if volume grows far beyond this brief's numbers | A future engineer, if the Council's business grows past what this brief describes |
+| ADR-004 | Partition by sitting | Sitting-scoped queries stay flat-cost as the archive grows to 216,000,000 rows | Any query spanning many sittings for one candidate is more expensive | A Council officer or auditor who ever needs a full multi-year transcript in one query |
+| ADR-005 | Distinct protocol per consumer | No consumer is forced onto a mismatched protocol; USSD/SMS candidates are genuinely served | Three integration surfaces to build, test, and operate instead of one | The Integrations engineer, who owns all three |
+| ADR-006 | Differentiated authentication per consumer | Trust strength matches the actual relationship with each consumer | Three authentication mechanisms to document and operate | The Security Lead and the Integrations engineer, who must keep all three current |
+| ADR-007 | Reserve/confirm idempotency on Takarda's side | Fixes the 9,100/year double-charge problem without waiting on the payment partner | Takarda carries a state machine and reconciliation job the partner should arguably own | The Integrations engineer, who owns the reconciliation job's ongoing correctness |
+| ADR-008 | URI-path versioning, 12-month minimum window | A school that hasn't re-integrated since last year keeps working | Two API versions must run and be tested simultaneously for at least 12 months after any breaking change | The Backend and QA engineers, who carry double the surface area during that window |

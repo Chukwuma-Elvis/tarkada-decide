@@ -1,0 +1,78 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="System Context" id="context1">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1300" pageHeight="950" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="candidate" value="Candidate&#10;(person, phone or browser)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="230" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="school" value="School&#10;(21,000 institutions)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="320" y="40" width="230" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="telco" value="Telecom Aggregator&#10;(external system)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="600" y="40" width="230" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="employer" value="Employers' Association&#10;(external system, up to 500,000 verifications/month)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="880" y="40" width="260" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="takarda" value="Takarda Results Platform" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="380" width="280" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="officer" value="Council Officer&#10;(person, internal user)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="700" width="230" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="regulator" value="Regulator / Council Board&#10;(person, oversight)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="320" y="700" width="230" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="payment" value="Payment Partner&#10;(external system, no idempotency support)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="880" y="700" width="260" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e1" value="checks result; buys PIN&#10;(browser)" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=11;rounded=0;" edge="1" parent="1" source="candidate" target="takarda">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e2" value="downloads result export&#10;for its candidates" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=11;rounded=0;" edge="1" parent="1" source="school" target="takarda">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e3" value="relays USSD sessions&#10;and SMS messages" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=11;rounded=0;" edge="1" parent="1" source="telco" target="takarda">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e3b" value="candidate reaches Takarda&#10;via USSD/SMS through here" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;dashed=1;rounded=0;" edge="1" parent="1" source="candidate" target="telco">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e4" value="verifies certificates" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=11;rounded=0;" edge="1" parent="1" source="employer" target="takarda">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e5" value="searches candidates;&#10;records amendments" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=11;rounded=0;" edge="1" parent="1" source="officer" target="takarda">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e6" value="relies on point-in-time&#10;reproducibility &amp; audit trail" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=11;rounded=0;" edge="1" parent="1" source="regulator" target="takarda">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e7" value="charges PIN purchase;&#10;reconciles settlements" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=11;rounded=0;" edge="1" parent="1" source="takarda" target="payment">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="note" value="Deliberately left out: internal Council finance/HR systems, the legacy 2009 system (migrated from, not integrated with), and any system used only for the author's own tooling. This diagram shows who Takarda talks to at run time, not everyone the Council operates." style="text;html=1;whiteSpace=wrap;fontSize=11;fontStyle=2;align=left;" vertex="1" parent="1">
+          <mxGeometry x="40" y="840" width="1100" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

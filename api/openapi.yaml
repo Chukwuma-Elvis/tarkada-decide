@@ -1,0 +1,552 @@
+openapi: 3.1.0
+info:
+  title: Takarda Results Platform API
+  version: "1.0.0"
+  description: >
+    API contract for the Takarda results-checking platform (Part C of the
+    Takarda decision dossier). Covers PIN purchase, candidate result checks,
+    school bulk export, employer/university certificate verification, and
+    the amendment workflow. Versioned in the URI path per ADR-008.
+  contact:
+    name: Takarda Engineering
+servers:
+  - url: https://api.takarda.example/v1
+    description: Version 1 (current)
+
+tags:
+  - name: pins
+  - name: result-checks
+  - name: schools
+  - name: verifications
+  - name: amendments
+  - name: results
+
+paths:
+  /pins:
+    post:
+      tags: [pins]
+      summary: Purchase a result-checker PIN
+      description: >
+        Creates a PIN. Not safe (charges a card) but idempotent when an
+        Idempotency-Key is supplied — see ADR-007 and Part C.4.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PinPurchaseRequest'
+      responses:
+        '201':
+          description: PIN issued and active.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pin'
+        '202':
+          description: Payment outcome unknown (partner timeout); poll the status URL.
+          headers:
+            Location:
+              description: URL to poll for the resolved PIN state.
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pin'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '402':
+          description: Payment declined by the partner. No PIN was created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Idempotency-Key reused with a different payload.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /pins/{pinId}:
+    get:
+      tags: [pins]
+      summary: Check the state of a previously requested PIN
+      description: Safe and idempotent. Used to poll a 202 response from PIN purchase.
+      parameters:
+        - name: pinId
+          in: path
+          required: true
+          description: Identifies the PIN resource.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Current PIN state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pin'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /result-checks:
+    post:
+      tags: [result-checks]
+      summary: Check a candidate's results for one sitting
+      description: >
+        Not safe (consumes one PIN use) but idempotent when an
+        Idempotency-Key is supplied — a retried request over a flaky
+        connection returns the same result without a second decrement
+        (FR-201, FR-204).
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResultCheckRequest'
+      responses:
+        '200':
+          description: Result check succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultCheckResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Exam number not found for the stated sitting, or the sitting has not been released yet (FR-205).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: PIN is exhausted (FR-202) or otherwise unusable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /schools/{schoolId}/sittings/{sittingId}/results:
+    get:
+      tags: [schools]
+      summary: Bulk export of a school's candidates' results for one sitting
+      description: Safe and idempotent. Served from the pre-materialized read tier once available (ADR-001).
+      security:
+        - schoolBearerAuth: []
+      parameters:
+        - name: schoolId
+          in: path
+          required: true
+          description: Identifies the school resource.
+          schema:
+            type: string
+        - name: sittingId
+          in: path
+          required: true
+          description: Identifies the examination sitting resource.
+          schema:
+            type: string
+        - name: subject
+          in: query
+          required: false
+          description: Filters the returned rows to one subject. Absent means all subjects.
+          schema:
+            type: string
+        - name: cursor
+          in: query
+          required: false
+          description: Pagination cursor for large exports.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Export ready.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SchoolExport'
+        '202':
+          description: Export not yet materialized for this sitting (FR-301).
+          headers:
+            Location:
+              description: URL to poll once the export is ready.
+              schema:
+                type: string
+                format: uri
+          content: {}
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /certificates/{certificateNumber}/verifications:
+    post:
+      tags: [verifications]
+      summary: Verify a certificate
+      description: >
+        Not safe (writes a verification-event audit record on every call,
+        FR-403) and deliberately not idempotent (each attempt is its own
+        auditable event). Date of birth travels in the body, never in the
+        URL, per the Data Protection Officer's requirement.
+      security:
+        - employerMutualTLS: []
+      parameters:
+        - name: certificateNumber
+          in: path
+          required: true
+          description: Identifies the certificate resource.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerificationRequest'
+      responses:
+        '200':
+          description: >
+            A match or a non-match. FR-402: the response shape and status
+            code are identical whether the certificate number does not
+            exist or the date of birth does not match, so a caller cannot
+            distinguish the two.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResult'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /amendments:
+    post:
+      tags: [amendments]
+      summary: Record an amendment to a result
+      description: >
+        Not safe, idempotent via Idempotency-Key. Requires officer
+        authentication (Assumption 4). Creates a new ResultVersion linked
+        to the officer and the evidence reference (FR-501).
+      security:
+        - officerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AmendmentRequest'
+      responses:
+        '201':
+          description: Amendment recorded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Amendment'
+        '400':
+          description: Missing evidence reference (FR-502) or other validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Authenticated officer lacks authority to amend this result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /results/{resultId}:
+    get:
+      tags: [results]
+      summary: Fetch the current value of a result
+      description: Safe and idempotent. Returns the current (latest, non-superseded) version.
+      security:
+        - officerAuth: []
+      parameters:
+        - name: resultId
+          in: path
+          required: true
+          description: Identifies the result resource.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Current result version.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultVersion'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /results/{resultId}/versions:
+    get:
+      tags: [results]
+      summary: Fetch the full version history of a result
+      description: >
+        Safe and idempotent. Supports the Regulator's point-in-time
+        reproducibility requirement (FR-504) via the optional asOf filter.
+      security:
+        - officerAuth: []
+      parameters:
+        - name: resultId
+          in: path
+          required: true
+          description: Identifies the result resource.
+          schema:
+            type: string
+        - name: asOf
+          in: query
+          required: false
+          description: Filters the history to the version that was current on this date. Absent returns full history.
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Version history (or the single as-of version if the asOf filter was supplied).
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResultVersion'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: Client-generated key that makes a retried request return the original outcome instead of repeating its side effect.
+      schema:
+        type: string
+        minLength: 8
+        maxLength: 128
+
+  responses:
+    BadRequest:
+      description: Malformed request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Missing or invalid credentials.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Resource does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    TooManyRequests:
+      description: Rate limit exceeded.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  securitySchemes:
+    schoolBearerAuth:
+      type: http
+      scheme: bearer
+      description: OAuth2 client-credentials bearer token issued to a school at onboarding (ADR-006).
+    employerMutualTLS:
+      type: mutualTLS
+      description: Mutual TLS client certificate presented by the employers' association (ADR-006).
+    officerAuth:
+      type: http
+      scheme: bearer
+      description: Council officer identity token (Assumption 4).
+
+  schemas:
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          example: PIN_EXHAUSTED
+        message:
+          type: string
+          example: This PIN has already been used five times.
+
+    PinPurchaseRequest:
+      type: object
+      required: [paymentMethodToken, amountKobo]
+      properties:
+        paymentMethodToken:
+          type: string
+          description: Tokenised reference to the card/payment method, never a raw card number.
+        amountKobo:
+          type: integer
+          description: Amount in whole kobo. Must equal 350000 for a standard PIN.
+          example: 350000
+
+    Pin:
+      type: object
+      required: [pinId, state, remainingUses]
+      properties:
+        pinId:
+          type: string
+          format: uuid
+        state:
+          type: string
+          enum: [PENDING_PAYMENT, ACTIVE, FAILED, AWAITING_CONFIRMATION]
+        remainingUses:
+          type: integer
+          minimum: 0
+          maximum: 5
+        pinCode:
+          type: string
+          description: Present only once state is ACTIVE.
+
+    ResultCheckRequest:
+      type: object
+      required: [examNumber, sittingId, pin]
+      properties:
+        examNumber:
+          type: string
+        sittingId:
+          type: string
+        pin:
+          type: string
+          description: Carried in the body, never the URL or query string.
+
+    ResultCheckResponse:
+      type: object
+      required: [examNumber, sittingId, subjects]
+      properties:
+        examNumber:
+          type: string
+        sittingId:
+          type: string
+        subjects:
+          type: array
+          items:
+            type: object
+            required: [subject, grade]
+            properties:
+              subject:
+                type: string
+              grade:
+                type: string
+
+    SchoolExport:
+      type: object
+      required: [schoolId, sittingId, candidates]
+      properties:
+        schoolId:
+          type: string
+        sittingId:
+          type: string
+        candidates:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResultCheckResponse'
+
+    VerificationRequest:
+      type: object
+      required: [dateOfBirth]
+      properties:
+        dateOfBirth:
+          type: string
+          format: date
+          description: Never sent as a query parameter, per the Data Protection Officer's requirement.
+
+    VerificationResult:
+      type: object
+      required: [match]
+      properties:
+        match:
+          type: boolean
+        sittingId:
+          type: string
+          description: Present only if match is true.
+        subjects:
+          type: array
+          description: Present only if match is true. Limited to the subjects the certificate covers — never the candidate's other subjects, address, phone number, or examination centre (FR-401).
+          items:
+            type: object
+            properties:
+              subject:
+                type: string
+              grade:
+                type: string
+
+    AmendmentRequest:
+      type: object
+      required: [resultId, newGrade, reasonCode, evidenceReference]
+      properties:
+        resultId:
+          type: string
+        newGrade:
+          type: string
+        reasonCode:
+          type: string
+          enum: [REMARK, APPEAL, ADMINISTRATIVE_CORRECTION]
+        evidenceReference:
+          type: string
+          description: Required (FR-502). Reference to the supporting evidence document.
+
+    Amendment:
+      type: object
+      required: [amendmentId, resultId, priorVersionId, newVersionId, officerId, amendedAt]
+      properties:
+        amendmentId:
+          type: string
+        resultId:
+          type: string
+        priorVersionId:
+          type: string
+        newVersionId:
+          type: string
+        officerId:
+          type: string
+        evidenceReference:
+          type: string
+        amendedAt:
+          type: string
+          format: date-time
+
+    ResultVersion:
+      type: object
+      required: [resultVersionId, resultId, grade, versionNumber, effectiveFrom, isCurrent]
+      properties:
+        resultVersionId:
+          type: string
+        resultId:
+          type: string
+        grade:
+          type: string
+        versionNumber:
+          type: integer
+        effectiveFrom:
+          type: string
+          format: date-time
+        recordedByOfficerId:
+          type: string
+          nullable: true
+        isCurrent:
+          type: boolean

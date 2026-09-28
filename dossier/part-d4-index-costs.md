@@ -1,0 +1,15 @@
+# Part D.4 — What every index costs
+
+| Index | Serves | Write cost | Storage | Effect on pre-release load (1,900,000 candidates × 9 subjects loaded before release) |
+|---|---|---|---|---|
+| `candidate(exam_number)` unique | Query 1 (resolve candidate) | Negligible — candidate rows are inserted in batch twice a year, not on any hot write path | Small (one string/integer key per candidate) | None — the candidate table is not written during the results-day load; it is loaded earlier, at registration |
+| `result`/`result_version(candidate_id)`, local to each sitting partition | Queries 1 and 2 (one composite index serves both — see note below) | Real: every one of the ~17,000,000 result rows loaded before a sitting maintains this index at insert time | Moderate — one entry per result row | This is the index actually present during the pre-release load window; it is the cost the brief is pointing at when it asks about "the hours when 1,900,000 results are loaded before release" |
+| `certificate(certificate_number)` unique | Query 3 | Low — certificates are created once per candidate per sitting, a smaller write volume than result rows | Small | Minor — certificate issuance can be scheduled independently of the raw result load |
+| `result_version(sitting_id, subject_id)` | Query 4 | Same load-time window as the candidate_id index above — one more index maintained during the same ~17,000,000-row load | Moderate | Adds to the same pre-release load window's total write cost |
+| `pg_trgm` GIN trigram index on `candidate(surname, other_names)` | Query 5 | Highest of all five — trigram/GIN index maintenance is heavier per write than a plain B-tree | Largest of all five — trigram indexes are typically several times the size of an equivalent B-tree | Low impact on the *results* load specifically, since candidate rows are loaded at registration, not at results release — but real impact on registration-time load, twice a year |
+
+**Note on the first two rows:** Queries 1 and 2 can be served by the *same* composite index (`candidate_id`, local to each sitting partition) rather than two separate ones — Query 1 seeks it for one candidate, Query 2 seeks it for an `IN`-list of ~400. Counting it once, not twice, avoids double-charging the pre-release load window for something that only needs to be paid for once.
+
+## The index deliberately not created
+
+**A covering index on `result_version(sitting_id, subject_id)` including `grade` and a denormalised `state` column**, which would make Query 4 an index-only scan instead of an index-scan-plus-join. **Declined** because Query 4 has no latency requirement — it is a post-sitting report, not a results-day path — and this index would add write overhead to every one of the ~17,000,000 result rows loaded before each sitting for a query that is already acceptable at its current cost. Being entitled to build it and choosing not to is itself a decision: it keeps the pre-release load window's total index-maintenance cost lower for a query that does not need the improvement.

@@ -1,0 +1,121 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Container" id="container1">
+    <mxGraphModel dx="1600" dy="1200" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1560" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Row 1: external actors -->
+        <mxCell id="candidate" value="Candidate" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="20" y="20" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="telco" value="Telecom Aggregator" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="240" y="20" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="school" value="School" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="460" y="20" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="officer_ext" value="Council Officer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="680" y="20" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="employer" value="Employers' Association" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="900" y="20" width="200" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="payment_ext" value="Payment Partner" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1140" y="20" width="200" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Row 2: edge -->
+        <mxCell id="gateway" value="API Gateway / Edge&#10;(TLS termination, auth, versioning, rate limiting)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="440" y="150" width="620" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Row 3: application services -->
+        <mxCell id="readsvc" value="Public Read Service&#10;(candidate check + school export)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="20" y="300" width="240" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="pinsvc" value="PIN &amp; Payment Service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="300" y="300" width="240" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="resultsvc" value="Results &amp; Amendment Service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="580" y="300" width="240" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="verifysvc" value="Verification Service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="860" y="300" width="240" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="officersvc" value="Officer Console&#10;(search + amendment UI)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1140" y="300" width="240" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- Row 4: jobs / broker -->
+        <mxCell id="recon" value="Reconciliation Job" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="160" y="460" width="240" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="broker" value="Message Broker&#10;(amendment events)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="660" y="460" width="240" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="builder" value="Read-Model Builder&#10;(scheduled + event-triggered)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="460" width="240" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Row 5: data stores -->
+        <mxCell id="primarydb" value="Primary Database&#10;(PostgreSQL, partitioned by sitting)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;shape=cylinder3;" vertex="1" parent="1">
+          <mxGeometry x="220" y="620" width="260" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="replicas" value="Read Replicas&#10;(async streaming, x2)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;shape=cylinder3;" vertex="1" parent="1">
+          <mxGeometry x="620" y="620" width="260" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="cdn" value="Object Storage + CDN&#10;(results-day static read tier)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;shape=cylinder3;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="620" width="260" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- edges: external -> gateway -->
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;" edge="1" parent="1" source="candidate" target="gateway"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;" edge="1" parent="1" source="telco" target="gateway"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e2b" value="USSD/SMS" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;dashed=1;" edge="1" parent="1" source="candidate" target="telco"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;" edge="1" parent="1" source="school" target="gateway"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;" edge="1" parent="1" source="officer_ext" target="gateway"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e5" value="mutual TLS" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;" edge="1" parent="1" source="employer" target="gateway"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- gateway -> services -->
+        <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;" edge="1" parent="1" source="gateway" target="readsvc"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;" edge="1" parent="1" source="gateway" target="pinsvc"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;" edge="1" parent="1" source="gateway" target="verifysvc"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;" edge="1" parent="1" source="gateway" target="officersvc"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- read service -->
+        <mxCell id="e10" value="results day: reads&#10;pre-materialized payloads" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" parent="1" source="readsvc" target="cdn"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e11" value="outside results day:&#10;reads live" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" parent="1" source="readsvc" target="replicas"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- pin service -->
+        <mxCell id="e12" value="charges card" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" parent="1" source="pinsvc" target="payment_ext"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e13" value="writes PIN /&#10;PaymentAttempt" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" parent="1" source="pinsvc" target="primarydb"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e14" value="hands off timeouts" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" parent="1" source="pinsvc" target="recon"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e15" value="polls transaction /&#10;settlement file" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" parent="1" source="recon" target="payment_ext"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e16" value="resolves PIN state" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" parent="1" source="recon" target="primarydb"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- results/amendment -->
+        <mxCell id="e17" value="submits amendment" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" parent="1" source="officersvc" target="resultsvc"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e18" value="writes ResultVersion&#10;/ Amendment" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" parent="1" source="resultsvc" target="primarydb"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e19" value="publishes&#10;amendment event" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" parent="1" source="resultsvc" target="broker"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e20" value="partial-surname search" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" parent="1" source="officersvc" target="replicas"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- verification -->
+        <mxCell id="e21" value="reads current result&#10;/ certificate" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" parent="1" source="verifysvc" target="replicas"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e22" value="writes&#10;VerificationEvent" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" parent="1" source="verifysvc" target="primarydb"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- broker -> builder -->
+        <mxCell id="e23" value="triggers refresh" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" parent="1" source="broker" target="builder"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e24" value="reads current results&#10;per sitting" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" parent="1" source="builder" target="primarydb"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e25" value="publishes refreshed&#10;payloads" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" parent="1" source="builder" target="cdn"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- replication -->
+        <mxCell id="e26" value="async streaming&#10;replication" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;dashed=1;" edge="1" parent="1" source="primarydb" target="replicas"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="note" value="Deliberately left out: internal deployment topology (containers vs. VMs vs. managed services), specific cloud provider, and the legacy 2009 system (a one-time migration source, not a running dependency of this diagram)." style="text;html=1;whiteSpace=wrap;fontSize=11;fontStyle=2;align=left;" vertex="1" parent="1">
+          <mxGeometry x="20" y="780" width="1360" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
