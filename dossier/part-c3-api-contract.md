@@ -4,7 +4,7 @@ The full machine-readable contract is in the repository at `api/openapi.yaml` (O
 
 ## Resources, not actions
 
-Every URL names a thing: `/pins`, `/result-checks`, `/schools/{schoolId}/sittings/{sittingId}/results`, `/certificates/{certificateNumber}/verifications`, `/amendments`, `/results/{resultId}`, `/results/{resultId}/versions`. There is no `/checkResult` or `/verifyCertificate` — an action becomes the creation of a resource that represents that event (a "verification," a "result check," an "amendment") rather than a verb bolted onto a noun.
+Every URL names a thing: `/pins`, `/result-checks`, `/schools/{schoolId}/sittings/{sittingId}/results`, `/certificates/{certificateNumber}/verifications`, `/certificates/{certificateNumber}/status`, `/amendments`, `/results/{resultId}`, `/results/{resultId}/versions`. There is no `/checkResult` or `/verifyCertificate` — an action becomes the creation of a resource that represents that event (a "verification," a "result check," an "amendment") rather than a verb bolted onto a noun.
 
 ## Method, safety, and idempotency, made explicit
 
@@ -16,6 +16,7 @@ Every URL names a thing: `/pins`, `/result-checks`, `/schools/{schoolId}/sitting
 | Verify a certificate | `POST /certificates/{certificateNumber}/verifications` | No | No, by design | Not safe, because it writes a verification-event audit record every time (a real side effect the Data Protection Officer and the Regulator both rely on); deliberately not idempotent, because two verification attempts are two auditable events, not one. The date of birth also travels in the body rather than the query string specifically so it is never logged or cached as part of a URL. |
 | Record an amendment | `POST /amendments` | No | Yes, via `Idempotency-Key` | A real write with regulatory weight; idempotency protects an officer's form double-submit from creating two amendment records for one action. |
 | Read current result / version history | `GET /results/{resultId}`, `GET /results/{resultId}/versions` | Yes | Yes | Pure reads. |
+| Check certificate status | `GET /certificates/{certificateNumber}/status` | Yes | Yes | Pure read of validity state only (`ACTIVE`/`SUPERSEDED`) — no date-of-birth challenge, since it returns no subject data at all. This is Conflict C's resolution made concrete (Part B.0): anyone holding a certificate, including years later, can always ask whether it still stands, without Takarda needing to have reached them proactively. |
 
 ## Parameters: filter vs. identify vs. body
 

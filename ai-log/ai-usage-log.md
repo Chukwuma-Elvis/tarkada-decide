@@ -38,6 +38,24 @@ Tool: Claude (Anthropic), used throughout as a drafting and reasoning partner fo
 
 **Task given:** Decompose nine months of work for a six-engineer team into packages of at most two engineer-weeks each, and state honestly whether the total fits.
 
-**Output:** 58 packages totalling 92 engineer-weeks, checked against a raw capacity of 234 engineer-weeks (6 × 39 weeks) and an estimated effective capacity of ~187 engineer-weeks after overhead.
+**Output:** A package list checked against a raw capacity of 234 engineer-weeks (6 x 39 weeks) and an estimated effective capacity of ~187 engineer-weeks after overhead; totals are re-derived in Part A.4 whenever the package list changes.
 
 **What required verification, and how:** This is arithmetic, not a factual claim that could be checked against an external source — verified by recomputing the running totals per phase against the table (Part A.4) rather than trusting a single summed figure. The 20% overhead deduction is explicitly labelled an estimate in the document itself, since no such figure exists in the brief, and no external source was available to check it against.
+
+## Entry 5 — Grading a competing submission surfaced a gap in this one
+
+**Task given:** Independently grade a different student's Takarda submission against the brief, and give a percentage with reasoning.
+
+**Output:** A findings table and a weighted score (~71%), including a note that the competing submission quantified why a *rejected* cloud architecture (serverless + DynamoDB) blew the budget, but never showed a comparable cost argument for its own *chosen* architecture — an asymmetry: rigor applied to what was rejected, not to what was recommended.
+
+**What was actually checked:** Whether this dossier had the identical asymmetry. It did — ADR-001 and Part B.3 argued why a scaled-for-peak monolith and synchronous microservices would each break the NGN 14,000,000 ceiling, but never argued why the *chosen* design stays under it, beyond asserting "flat cost by construction."
+
+**Correction made:** Added a short reasoning paragraph to Part B.3 ("Does the chosen architecture actually fit...") arguing the fit structurally — cost is coupled to data volume (a few GB/day) rather than request rate (the ~150x spike) — rather than inventing specific cloud prices, since the brief explicitly does not require a pricing sheet and fabricated dollar figures would violate the "every number is sourced, measured, or a labelled estimate" rule.
+
+## Entry 6 — Reused two ideas from the competing submission, rejected a third
+
+**Task given:** Take the best parts of the competing submission (Entry 5) and integrate them into this dossier.
+
+**What was reused, and why:** (1) A sharper three-part proof of *why* the Head of Operations' request is impossible (physical boundary, legal/evidentiary causality, distributed-consistency limits) — integrated into Part B.0, strengthening what was previously a one-sentence assertion. (2) A concrete certificate-status/revocation endpoint with a notification to recent verifiers — integrated as FR-405/FR-406, `GET /certificates/{certificateNumber}/status`, and a `SUPERSEDED` status on the `Certificate` entity, giving Conflict C's resolution an actual mechanism rather than only a policy statement.
+
+**What was checked and rejected:** The competing submission's own 2G-latency arithmetic ("TCP (1 RTT = 600ms) + TLS 1.3 (1 RTT = 600ms) requires 1.8 seconds") does not add up — 600ms + 600ms = 1,200ms, not 1,800ms. Rather than reusing the number, Part C.1 was rewritten with the arithmetic shown correctly: TCP + TLS 1.3 is 2 round trips (1.2s at a 600ms RTT), TCP + TLS 1.2 is 3 round trips (1.8s) — the *idea* of putting a concrete number on the handshake cost was worth keeping; the specific number as originally presented was not.

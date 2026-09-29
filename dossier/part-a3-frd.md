@@ -52,6 +52,10 @@ Every requirement names a trigger and the observable response to that trigger. N
 
 **FR-404.** When the same certificate is verified again after an amendment has changed its underlying result, the verification response reflects the current (post-amendment) value, not the value that was current at the time of any earlier verification.
 
+**FR-405.** When any party queries `GET /certificates/{certificateNumber}/status` (no date-of-birth challenge required, since this endpoint returns only validity state, never subject grades), the system returns the certificate's current status (`ACTIVE` or `SUPERSEDED`) and, if superseded, the amendment identifier and the date it was superseded.
+
+**FR-406.** When a certificate's status changes to `SUPERSEDED` as a result of FR-501, the system dispatches a status-change notification to every employer account that verified that certificate within the trailing 12 months, without requiring the employer to re-query first.
+
 ## Amendment workflow (FR-500 series)
 
 **FR-501.** When an authenticated Council officer submits an amendment for a result with a reason code and an evidence reference, the system creates a new, immutable result version, links it to the amendment record, the officer's identity, and the prior version, and never overwrites the prior version's stored values.
@@ -61,6 +65,8 @@ Every requirement names a trigger and the observable response to that trigger. N
 **FR-503.** When an amendment is recorded, the system marks the result as changed for the next scheduled read-model refresh; it does not attempt to update the results-day static payload already generated for that candidate in real time.
 
 **FR-504.** When any party requests the value a given result held as of a specific past date, the system reconstructs it from the version history and returns the version that was current on that date, never the latest version, unless the two happen to be the same.
+
+**FR-505.** When an amendment changes a result that a certificate covers, the system marks that certificate `SUPERSEDED`, links it to the amendment record, issues a new certificate version for the corrected value, and triggers FR-406's notification — this is the mechanism that gives Conflict C's resolution (Part B.0) a concrete implementation rather than a promise.
 
 ## USSD / SMS channel (FR-600 series)
 

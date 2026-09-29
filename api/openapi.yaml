@@ -226,6 +226,36 @@ paths:
         '429':
           $ref: '#/components/responses/TooManyRequests'
 
+  /certificates/{certificateNumber}/status:
+    get:
+      tags: [verifications]
+      summary: Check whether a certificate still stands
+      description: >
+        Safe and idempotent. No date-of-birth challenge and no
+        Data-Protection-Officer-restricted fields are returned — this
+        endpoint answers validity only, never subject grades, so it is
+        open to any holder of a certificate number, including years after
+        issue. This is the concrete mechanism behind Conflict C's
+        resolution (Part B.0): an amendment cannot rewrite a verification
+        an employer already has, but it can flip this endpoint's answer
+        and trigger a notification (FR-406) to whoever checked it recently.
+      parameters:
+        - name: certificateNumber
+          in: path
+          required: true
+          description: Identifies the certificate resource.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Current status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CertificateStatus'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
   /amendments:
     post:
       tags: [amendments]
@@ -494,6 +524,24 @@ components:
                 type: string
               grade:
                 type: string
+
+    CertificateStatus:
+      type: object
+      required: [certificateNumber, status]
+      properties:
+        certificateNumber:
+          type: string
+        status:
+          type: string
+          enum: [ACTIVE, SUPERSEDED]
+        supersededByAmendmentId:
+          type: string
+          nullable: true
+          description: Present only when status is SUPERSEDED.
+        supersededAt:
+          type: string
+          format: date-time
+          nullable: true
 
     AmendmentRequest:
       type: object
