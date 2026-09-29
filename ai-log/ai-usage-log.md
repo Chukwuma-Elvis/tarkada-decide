@@ -40,6 +40,8 @@ Tool: Claude (Anthropic), used throughout as a drafting and reasoning partner fo
 
 **Output:** A package list checked against a raw capacity of 234 engineer-weeks (6 x 39 weeks) and an estimated effective capacity of ~187 engineer-weeks after overhead; totals are re-derived in Part A.4 whenever the package list changes.
 
+**Later correction (during refinement):** This table initially ran to three pages against the brief's two-page target. The first fix attempted was cutting or coarsening packages to force two pages — rejected, because that would mean either exceeding the two-engineer-week cap per package or quietly dropping real work, both worse than being a page over. The actual fix was typographic (smaller table font and tighter row padding specific to this one table, via a `.wbs` CSS scope in `build_dossier.py`), which reached two pages without changing a single estimate or package boundary. Worth recording because the two fixes look similar ("make the WBS shorter") but are not: one is honest, one isn't.
+
 **What required verification, and how:** This is arithmetic, not a factual claim that could be checked against an external source — verified by recomputing the running totals per phase against the table (Part A.4) rather than trusting a single summed figure. The 20% overhead deduction is explicitly labelled an estimate in the document itself, since no such figure exists in the brief, and no external source was available to check it against.
 
 ## Entry 5 — Grading a competing submission surfaced a gap in this one
@@ -59,3 +61,19 @@ Tool: Claude (Anthropic), used throughout as a drafting and reasoning partner fo
 **What was reused, and why:** (1) A sharper three-part proof of *why* the Head of Operations' request is impossible (physical boundary, legal/evidentiary causality, distributed-consistency limits) — integrated into Part B.0, strengthening what was previously a one-sentence assertion. (2) A concrete certificate-status/revocation endpoint with a notification to recent verifiers — integrated as FR-405/FR-406, `GET /certificates/{certificateNumber}/status`, and a `SUPERSEDED` status on the `Certificate` entity, giving Conflict C's resolution an actual mechanism rather than only a policy statement.
 
 **What was checked and rejected:** The competing submission's own 2G-latency arithmetic ("TCP (1 RTT = 600ms) + TLS 1.3 (1 RTT = 600ms) requires 1.8 seconds") does not add up — 600ms + 600ms = 1,200ms, not 1,800ms. Rather than reusing the number, Part C.1 was rewritten with the arithmetic shown correctly: TCP + TLS 1.3 is 2 round trips (1.2s at a 600ms RTT), TCP + TLS 1.2 is 3 round trips (1.8s) — the *idea* of putting a concrete number on the handshake cost was worth keeping; the specific number as originally presented was not.
+
+## Entry 7 — Closing a self-identified verification gap on the diagrams
+
+**Task given:** Refine every part of this dossier that scored below full marks in the graded review, including a noted gap that the C4 diagrams were checked for valid XML but never actually rendered or checked for overlapping elements.
+
+**What was actually checked:** Wrote `scripts/render_drawio_check.py`, a small parser that reads each `.drawio` file's own `mxCell` geometry and style, renders it with matplotlib, and programmatically flags any two boxes that overlap or any edge pointing at a node ID that doesn't exist.
+
+**What was found, and corrected:** The first run of the checker flagged the component diagram's boundary box as "overlapping" every component inside it. Investigating before treating that as a real defect: the checker was ignoring the `verticalAlign=top` style on the boundary's label, so it drew the label centred over the child components instead of at the top of the box, which is not what the actual `style` attribute specifies. The checker was fixed to honour `verticalAlign=top`; re-rendered, the boundary's title sits clear at the top and the reported overlaps were confirmed to be the checker's own earlier bug, not a defect in the diagram. All three diagrams now report zero real overlaps and zero dangling edges — a substantially stronger claim than "the XML parses."
+
+## Entry 8 — Rendering a diagram checker prompted checking the dossier's own rendering the same way
+
+**Task given:** none directly — this followed from the habit Entry 7 established (don't trust that a file "looks right"; render it and look).
+
+**What was actually checked:** Whether the same discipline applied to the *dossier PDF itself*. It hadn't been — every prior visual check happened to land on pages where lists rendered correctly. Rendering the BRD and PRD pages specifically (the two documents an earlier grading pass said needed more depth) surfaced a real bug: in both files, a bold lead-in line (`**In scope:**`, `**Explicitly out of scope for Release 1**...`, `Success is checkable, not aspirational:`) was directly followed by a bulleted list with no blank line between them. `python-markdown` treats that as one paragraph and renders the list as run-on dash-separated text instead of actual bullets — the content was always correct, but it was never visually a list.
+
+**Correction made:** Inserted a blank line between each bold lead-in and its list in `part-a1-brd.md` and `part-a2-prd.md`, then scanned every other dossier file programmatically for the same adjacency pattern (none found) before rebuilding and re-rendering both pages to confirm proper bullets.

@@ -1,5 +1,7 @@
 # Part A.2 — Product Requirements Document
 
+Takarda has one product-level tension that every feature below inherits: it must feel instant to seven very different users at once (a candidate on a feature phone, a school pulling hundreds of rows, an employer's automated system) while costing the same every month regardless of how many of them show up on the same day. Nothing in this document should be read as satisfying every user's first-choice request — Part B.0 names where that isn't possible and what was chosen instead. What follows is what actually ships, for whom, and in what order.
+
 ## Users and their jobs
 
 | User | Job to be done | Good outcome |
@@ -9,22 +11,26 @@
 | Candidate (any channel) | Buy a PIN without being charged twice | One PIN, one charge, confirmed or safely retried |
 | School administrator | Get every result for my school's candidates at noon on results day | A complete, correct file for my ~400 candidates, ready at noon |
 | Employer / university (via the employers' association) | Confirm a certificate is genuine | A yes/no plus the minimal data needed to confirm it, nothing else about the candidate |
+| Employer / university (recurring) | Find out if a certificate I verified before still stands | A status check they can run any time, and a notification if one they checked recently is superseded, without Takarda needing to have their contact details in advance |
 | Council officer | Find a candidate from a partial surname; record an amendment with evidence | Search returns in an interactive time; amendment is recorded with officer and evidence attached, permanently |
 | Regulator (Council board, via the officer/audit path) | Prove what a result said on any past date | Point-in-time reconstruction available for any released result, for 50 years |
 
 ## Scope — Release 1 (the May sitting)
 
 **In scope:**
+
 - Candidate result check: browser (HTTPS) and USSD/SMS (via telecom aggregator).
 - PIN purchase with the reserve/confirm idempotency fix (Part C.4) — the double-charge problem is fixed in Release 1, not deferred.
 - Results-day pre-materialized read path for candidates and schools (Part B, ADR-001).
 - School bulk export for one sitting.
 - Employer/university certificate verification, DPO-filtered.
+- Certificate status check and supersession notification (Part B.0, Conflict C's resolution).
 - Amendment workflow with officer attribution and evidence reference.
 - Officer partial-surname search.
 - Core data model supporting 50-year point-in-time reproducibility.
 
 **Explicitly out of scope for Release 1** (see Part B.6, "What you are not building," for the full reasoning):
+
 - Real-time push notification of amendments to candidates/schools/employers.
 - Self-service live analytics dashboards for the Council beyond the existing per-sitting report.
 - Any identity check beyond PIN + exam number for candidate access.

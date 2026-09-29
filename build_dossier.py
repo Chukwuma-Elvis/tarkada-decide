@@ -52,8 +52,10 @@ h3 { font-size: 11pt; margin-top: 10px; color: #333333; }
 p { margin: 6px 0; text-align: justify; }
 table { border-collapse: collapse; width: 100%; margin: 6px 0 12px 0; font-size: 8.6pt; }
 th, td { border: 0.75pt solid #999999; padding: 2px 5px; text-align: left; vertical-align: top; }
-.wbs table { font-size: 7.6pt; }
-.wbs th, .wbs td { padding: 1.5px 4px; }
+.wbs table { font-size: 7.2pt; margin: 3px 0 8px 0; }
+.wbs th, .wbs td { padding: 1px 3px; }
+.wbs p { margin: 3px 0; }
+.wbs h2 { margin-top: 8px; }
 th { background-color: #eeeeee; font-weight: bold; }
 code { font-family: Courier, monospace; font-size: 9pt; background-color: #f2f2f2; }
 strong { font-weight: bold; }

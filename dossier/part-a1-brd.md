@@ -9,6 +9,7 @@ Three groups suffer under the current arrangement. **Candidates**, some on 2G wi
 ## What success looks like
 
 Success is checkable, not aspirational:
+
 - The result-check endpoint answers **99.95% of requests during the results-day peak hour** (<= 22 seconds of failure in that hour).
 - Infrastructure spend does not exceed **NGN 14,000,000/month**, including on results day.
 - The **9,100-a-year double-charge** figure falls to a number detected and refunded automatically, with zero requiring a human to read a spreadsheet.

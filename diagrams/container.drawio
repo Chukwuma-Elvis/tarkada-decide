@@ -103,6 +103,8 @@
         <!-- verification -->
         <mxCell id="e21" value="reads current result&#10;/ certificate" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" parent="1" source="verifysvc" target="replicas"><mxGeometry relative="1" as="geometry" /></mxCell>
         <mxCell id="e22" value="writes&#10;VerificationEvent" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" parent="1" source="verifysvc" target="primarydb"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e27" value="consumes cert&#10;SUPERSEDED event" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;dashed=1;" edge="1" parent="1" source="broker" target="verifysvc"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e28" value="pushes status-change&#10;webhook (FR-406)" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" parent="1" source="verifysvc" target="employer"><mxGeometry relative="1" as="geometry" /></mxCell>
 
         <!-- broker -> builder -->
         <mxCell id="e23" value="triggers refresh" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" parent="1" source="broker" target="builder"><mxGeometry relative="1" as="geometry" /></mxCell>

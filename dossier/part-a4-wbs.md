@@ -1,6 +1,6 @@
 # Part A.4 — Work Breakdown Structure
 
-Team (Assumption 6): 3 backend/platform engineers, 1 DBA, 1 integrations engineer, 1 QA — six including the author. No package exceeds two engineer-weeks; two related sub-week tasks are merged into one row only where doing so does not push that row past the two-week cap — this table stays a little over the brief's two-page target as a result, on the view that an honestly-capped WBS is worth more than a shorter one built by quietly exceeding the cap. Role/estimate abbreviated: BE=backend, FE=frontend, INT=integrations, DBA, QA, Auth=author.
+Team (Assumption 6): 3 backend/platform engineers, 1 DBA, 1 integrations engineer, 1 QA — six including the author. No package exceeds two engineer-weeks; two related sub-week tasks are merged into one row only where doing so does not push that row past the two-week cap. Role/estimate abbreviated: BE=backend, FE=frontend, INT=integrations, DBA, QA, Auth=author.
 
 ## R0 — Foundation (months 1–3)
 
