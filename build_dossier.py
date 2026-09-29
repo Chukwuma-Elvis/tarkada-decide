@@ -1,6 +1,7 @@
 import markdown
 from xhtml2pdf import pisa
 import os
+import re
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 DOSSIER = os.path.join(BASE, "dossier")
@@ -45,12 +46,12 @@ CSS = """
     }
 }
 body { font-family: Helvetica, Arial, sans-serif; font-size: 10.2pt; line-height: 1.42; color: #222222; }
-h1 { -pdf-outline: true; -pdf-outline-level: 0; page-break-before: always; font-size: 19pt; color: #111111;
+h1 { -pdf-outline: true; -pdf-outline-level: 0; page-break-before: always; -pdf-keep-with-next: true; font-size: 19pt; color: #111111;
      border-bottom: 2px solid #b30000; padding-bottom: 6px; margin-top: 0; }
-h2 { -pdf-outline: true; -pdf-outline-level: 1; font-size: 13pt; margin-top: 16px; color: #b30000; }
-h3 { font-size: 11pt; margin-top: 10px; color: #333333; }
+h2 { -pdf-outline: true; -pdf-outline-level: 1; -pdf-keep-with-next: true; font-size: 13pt; margin-top: 16px; color: #b30000; }
+h3 { -pdf-keep-with-next: true; font-size: 11pt; margin-top: 10px; color: #333333; }
 p { margin: 6px 0; text-align: justify; }
-table { border-collapse: collapse; width: 100%; margin: 6px 0 12px 0; font-size: 8.6pt; }
+table { border-collapse: collapse; table-layout: fixed; width: 100%; margin: 6px 0 12px 0; font-size: 8.6pt; }
 th, td { border: 0.75pt solid #999999; padding: 2px 5px; text-align: left; vertical-align: top; }
 .wbs table { font-size: 7.2pt; margin: 3px 0 8px 0; }
 .wbs th, .wbs td { padding: 1px 3px; }
@@ -58,6 +59,7 @@ th, td { border: 0.75pt solid #999999; padding: 2px 5px; text-align: left; verti
 .wbs h2 { margin-top: 8px; }
 th { background-color: #eeeeee; font-weight: bold; }
 code { font-family: Courier, monospace; font-size: 9pt; background-color: #f2f2f2; }
+td code, th code { font-size: 7.6pt; background-color: transparent; }
 strong { font-weight: bold; }
 ul, ol { margin: 4px 0 8px 18px; padding: 0; }
 li { margin: 2px 0; }
@@ -68,10 +70,29 @@ li { margin: 2px 0; }
 .toc-entry { margin: 5px 0; font-size: 11pt; }
 """
 
+def add_break_opportunities(html):
+    """Long unbroken tokens inside <code> (API paths, SQL-style identifiers
+    like result_version(sitting_id, subject_id)) overflow a table cell
+    instead of wrapping, since reportlab's default word-wrap only breaks on
+    whitespace, and a zero-width space isn't in the base-14 fonts' encoding
+    (renders as a missing-glyph box, tried and reverted -- see AI log). A
+    plain space after each natural separator (/ ( ) , _ -) is a real,
+    always-supported break opportunity -- inserted only inside table cells,
+    since body paragraphs are wide enough that inline code never needs it,
+    and there's no reason to cosmetically alter identifiers where the
+    original bug doesn't occur."""
+    def inject_code(m):
+        content = m.group(1)
+        return "<code>" + re.sub(r"([/(),_-])", r"\1 ", content) + "</code>"
+    def inject_cell(m):
+        return re.sub(r"<code>(.*?)</code>", inject_code, m.group(0), flags=re.DOTALL)
+    return re.sub(r"<t[dh][^>]*>.*?</t[dh]>", inject_cell, html, flags=re.DOTALL)
+
 def md_to_html(path):
     with open(os.path.join(BASE, path), encoding="utf-8") as f:
         text = f.read()
-    return markdown.markdown(text, extensions=["tables", "fenced_code", "sane_lists"])
+    html = markdown.markdown(text, extensions=["tables", "fenced_code", "sane_lists"])
+    return add_break_opportunities(html)
 
 def build():
     body_parts = []
