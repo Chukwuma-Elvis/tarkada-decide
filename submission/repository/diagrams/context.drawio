@@ -37,36 +37,76 @@
           <mxGeometry x="880" y="700" width="260" height="100" as="geometry" />
         </mxCell>
 
-        <mxCell id="e1" value="checks result; buys PIN&#10;(browser)" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=11;rounded=0;" edge="1" parent="1" source="candidate" target="takarda">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="e1" value="checks result; buys PIN&#10;(browser)" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=11;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.2;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="candidate" target="takarda">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="155" y="215" />
+              <mxPoint x="556" y="215" />
+            </Array>
+          </mxGeometry>
         </mxCell>
 
-        <mxCell id="e2" value="downloads result export&#10;for its candidates" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=11;rounded=0;" edge="1" parent="1" source="school" target="takarda">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="e2" value="downloads result export&#10;for its candidates" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=11;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.3;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="school" target="takarda">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="435" y="255" />
+              <mxPoint x="584" y="255" />
+            </Array>
+          </mxGeometry>
         </mxCell>
 
-        <mxCell id="e3" value="relays USSD sessions&#10;and SMS messages" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=11;rounded=0;" edge="1" parent="1" source="telco" target="takarda">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="e3" value="relays USSD sessions&#10;and SMS messages" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=11;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.7;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="telco" target="takarda">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="715" y="295" />
+              <mxPoint x="696" y="295" />
+            </Array>
+          </mxGeometry>
         </mxCell>
 
-        <mxCell id="e3b" value="candidate reaches Takarda&#10;via USSD/SMS through here" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;dashed=1;rounded=0;" edge="1" parent="1" source="candidate" target="telco">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="e3b" value="candidate reaches Takarda&#10;via USSD/SMS through here" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;dashed=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="candidate" target="telco">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="155" y="170" />
+              <mxPoint x="715" y="170" />
+            </Array>
+          </mxGeometry>
         </mxCell>
 
-        <mxCell id="e4" value="verifies certificates" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=11;rounded=0;" edge="1" parent="1" source="employer" target="takarda">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="e4" value="verifies certificates" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=11;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.8;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="employer" target="takarda">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1010" y="335" />
+              <mxPoint x="724" y="335" />
+            </Array>
+          </mxGeometry>
         </mxCell>
 
-        <mxCell id="e5" value="searches candidates;&#10;records amendments" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=11;rounded=0;" edge="1" parent="1" source="officer" target="takarda">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="e5" value="searches candidates;&#10;records amendments" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=11;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.2;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="officer" target="takarda">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="155" y="560" />
+              <mxPoint x="556" y="560" />
+            </Array>
+          </mxGeometry>
         </mxCell>
 
-        <mxCell id="e6" value="relies on point-in-time&#10;reproducibility &amp; audit trail" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=11;rounded=0;" edge="1" parent="1" source="regulator" target="takarda">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="e6" value="relies on point-in-time&#10;reproducibility &amp; audit trail" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=11;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.3;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="regulator" target="takarda">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="435" y="600" />
+              <mxPoint x="584" y="600" />
+            </Array>
+          </mxGeometry>
         </mxCell>
 
-        <mxCell id="e7" value="charges PIN purchase;&#10;reconciles settlements" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=11;rounded=0;" edge="1" parent="1" source="takarda" target="payment">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="e7" value="charges PIN purchase;&#10;reconciles settlements" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=11;rounded=0;exitX=0.7;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="takarda" target="payment">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="696" y="640" />
+              <mxPoint x="1010" y="640" />
+            </Array>
+          </mxGeometry>
         </mxCell>
 
         <mxCell id="note" value="Deliberately left out: internal Council finance/HR systems, the legacy 2009 system (migrated from, not integrated with), and any system used only for the author's own tooling. This diagram shows who Takarda talks to at run time, not everyone the Council operates." style="text;html=1;whiteSpace=wrap;fontSize=11;fontStyle=2;align=left;" vertex="1" parent="1">
