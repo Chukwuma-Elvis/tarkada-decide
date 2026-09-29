@@ -1,4 +1,4 @@
-# Takarda Decision Dossier — repository
+# Takarda Decision Dossier — repository()
 
 This folder is the machine-readable half of the Takarda (Decide) assignment submission, per the brief's requirement for "a repository containing the API contract as a specification file that validates, and the diagrams as files rather than as images pasted into the PDF." The narrative dossier and one-page summary are the two documents one level up, in `submission/`.
 
