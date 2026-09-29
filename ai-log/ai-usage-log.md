@@ -1,95 +1,21 @@
 # Part E — AI usage log
 
-Tool: Claude (Anthropic), used throughout as a drafting and reasoning partner for this dossier, working directly from the assignment brief supplied by the student.
+Tool: Claude (Anthropic), used throughout as a drafting and reasoning partner, working directly from the assignment brief.
 
-## Entry 1 — Stakeholder conflict analysis
+**Stakeholder conflicts.** Re-checked the three named conflicts against the brief's own numbers (traffic ratio, budget, retention window) before accepting the framing. Held up, no correction needed.
 
-**Task given:** Read the brief's stakeholder list and identify which pairs of stated requirements are in direct conflict, and which single request is impossible as written.
+**Query 5 index design — caught and corrected.** First pass proposed a plain B-tree index on `surname` for the officer's partial-name search. Checked: a B-tree only accelerates a left-anchored prefix match; it gives no benefit against a leading-wildcard pattern, so the query would have fallen back to a full 24,000,000-row scan. Corrected to a `pg_trgm` trigram GIN index and priced its extra write/storage cost separately (Part D.3, D.4).
 
-**Output:** Three conflicting pairs identified — Registrar vs. Finance Director, Head of Schools vs. Finance Director (same root cause: fixed budget vs. a ~150x results-day traffic spike), and Head of Operations vs. Regulator (amendment visibility vs. 50-year point-in-time reproducibility) — with the third also identified as the impossible-as-written request.
+**OpenAPI spec validation — caught and corrected.** Initial spec declared `openapi: 3.0.3` with a `mutualTLS` security scheme. `openapi-spec-validator` rejected it — that type only exists in 3.1. Bumped the version, re-ran, passed.
 
-**Verification performed:** Re-checked each conflict against the brief's own stated numbers (NGN 14,000,000/month fixed; <20 checks/sec baseline vs. ~2,900/sec peak; 50-year retention requirement) rather than accepting the framing on first read, to confirm the conflict was forced by the numbers and not an assumption. Held up — no correction needed.
+**WBS capacity check.** Verified by recomputing per-phase totals against the table rather than trusting one summed figure; the 20% overhead deduction is labelled an estimate since no such figure exists in the brief. The table's page count moved twice during later refinement (3->2 pages via table typography, then back to 3 when a dossier-wide "no orphaned heading" fix pushed the R1 table to a new page as a unit) — both are logged as deliberate, explained trade-offs, not oversights.
 
-## Entry 2 — Index design for the partial-surname search (Query 5)
+**Grading a competing submission.** Found it argued why a rejected cloud architecture blew the budget but never argued why its chosen one fit — checked this dossier for the same asymmetry, found it, and added reasoning (not invented pricing) to Part B.3.
 
-**Task given:** Predict the index, access method, and cost for a Council officer's partial-surname search ("matches anywhere in the name") against 24,000,000 candidate rows.
+**Integrating that submission's ideas.** Reused its three-part impossibility proof and its certificate-status/notification mechanism (now FR-405/406/505). Rejected its 2G handshake arithmetic — it presented 600ms + 600ms as 1.8 seconds; that's 1.2 seconds — and rewrote Part C.1 with the correct figures for both TLS versions.
 
-**Initial output:** The first pass toward this answer treated a standard B-tree index on `surname` as sufficient, reasoning by the general habit that "an index makes lookups fast."
+**Diagram verification — caught and corrected.** Wrote a script to render each `.drawio` file's actual geometry rather than trusting that valid XML meant a correct diagram. Its first run flagged false overlaps; checked before trusting that result, and found the checker itself was ignoring a `verticalAlign=top` style. Fixed the checker, confirmed all three diagrams are genuinely clean.
 
-**What was actually checked:** How a B-tree index actually supports the SQL `LIKE`/`ILIKE` operator — a B-tree can accelerate a left-anchored prefix match (`'name%'`) via a sorted range scan, because a prefix match aligns with the index's own sort order. A pattern with a leading wildcard (`'%name%'`) has no such alignment; there is no way to seek toward "contains this substring anywhere" in a structure sorted by "starts with."
+**BRD/PRD list rendering — caught and corrected.** Rendering those two pages (flagged as needing more depth) showed bulleted lists rendering as run-on text: a bold lead-in line directly followed by a list with no blank line, which `python-markdown` merges into one paragraph. Fixed in both files; scanned the rest of the dossier for the same pattern.
 
-**What was actually true:** A plain B-tree index on `surname` gives the officer's "anywhere in the name" search no benefit at all — without a purpose-built index, the query falls back to a full sequential scan of all 24,000,000 candidate rows.
-
-**Correction made:** Replaced the plain B-tree recommendation with a PostgreSQL `pg_trgm` trigram `GIN` index, which is designed for substring search, and priced its higher write and storage cost separately from the other four proposed indexes in Part D.4. This is recorded in Part D.3 (Query 5) and Part D.4 as the final, corrected answer — the log entry here documents that the first instinct was wrong and why.
-
-## Entry 3 — OpenAPI contract validation
-
-**Task given:** Produce the API contract as a specification file that validates, per the assignment's submission requirement.
-
-**Initial output:** A spec declared as `openapi: 3.0.3`, using `type: mutualTLS` for the employers' association's security scheme, to represent certificate-based machine authentication (ADR-006).
-
-**Verification performed:** Ran the file through `openapi-spec-validator` (installed locally) rather than assuming it was correct because it "looked right."
-
-**What was actually true:** The validator rejected the file — `mutualTLS` is not a valid `securitySchemes` type under OpenAPI 3.0.x; it was only introduced in OpenAPI 3.1.
-
-**Correction made:** Changed the document version to `openapi: 3.1.0` and re-ran the validator, which then passed with no errors. The validated file is committed at `api/openapi.yaml`.
-
-## Entry 4 — Work Breakdown Structure capacity check
-
-**Task given:** Decompose nine months of work for a six-engineer team into packages of at most two engineer-weeks each, and state honestly whether the total fits.
-
-**Output:** A package list checked against a raw capacity of 234 engineer-weeks (6 x 39 weeks) and an estimated effective capacity of ~187 engineer-weeks after overhead; totals are re-derived in Part A.4 whenever the package list changes.
-
-**Later correction (during refinement):** This table initially ran to three pages against the brief's two-page target. The first fix attempted was cutting or coarsening packages to force two pages — rejected, because that would mean either exceeding the two-engineer-week cap per package or quietly dropping real work, both worse than being a page over. The actual fix was typographic (smaller table font and tighter row padding specific to this one table, via a `.wbs` CSS scope in `build_dossier.py`), which reached two pages without changing a single estimate or package boundary.
-
-**Further correction (a later refinement pass):** A subsequent request asked that no heading be separated from its content by a page break, applied dossier-wide via `-pdf-keep-with-next` on every heading. That pushed the WBS back to three pages: the R0 table alone now fills page 11, so the R1 heading moves to page 12 as a whole unit rather than starting mid-page-11 and letting the table split awkwardly across the break. This was accepted rather than reverted — the heading/content rule was the explicit ask for that pass, and it applies to every heading in the document, not just this one table, so carving out an exception for the WBS would have meant the fix wasn't actually general. Worth recording because it shows the two-page target and the no-orphaned-heading rule can genuinely conflict, and when they do, the correctness rule (stated explicitly, this turn) took priority over the length target (stated implicitly, an earlier turn).
-
-**What required verification, and how:** This is arithmetic, not a factual claim that could be checked against an external source — verified by recomputing the running totals per phase against the table (Part A.4) rather than trusting a single summed figure. The 20% overhead deduction is explicitly labelled an estimate in the document itself, since no such figure exists in the brief, and no external source was available to check it against.
-
-## Entry 5 — Grading a competing submission surfaced a gap in this one
-
-**Task given:** Independently grade a different student's Takarda submission against the brief, and give a percentage with reasoning.
-
-**Output:** A findings table and a weighted score (~71%), including a note that the competing submission quantified why a *rejected* cloud architecture (serverless + DynamoDB) blew the budget, but never showed a comparable cost argument for its own *chosen* architecture — an asymmetry: rigor applied to what was rejected, not to what was recommended.
-
-**What was actually checked:** Whether this dossier had the identical asymmetry. It did — ADR-001 and Part B.3 argued why a scaled-for-peak monolith and synchronous microservices would each break the NGN 14,000,000 ceiling, but never argued why the *chosen* design stays under it, beyond asserting "flat cost by construction."
-
-**Correction made:** Added a short reasoning paragraph to Part B.3 ("Does the chosen architecture actually fit...") arguing the fit structurally — cost is coupled to data volume (a few GB/day) rather than request rate (the ~150x spike) — rather than inventing specific cloud prices, since the brief explicitly does not require a pricing sheet and fabricated dollar figures would violate the "every number is sourced, measured, or a labelled estimate" rule.
-
-## Entry 6 — Reused two ideas from the competing submission, rejected a third
-
-**Task given:** Take the best parts of the competing submission (Entry 5) and integrate them into this dossier.
-
-**What was reused, and why:** (1) A sharper three-part proof of *why* the Head of Operations' request is impossible (physical boundary, legal/evidentiary causality, distributed-consistency limits) — integrated into Part B.0, strengthening what was previously a one-sentence assertion. (2) A concrete certificate-status/revocation endpoint with a notification to recent verifiers — integrated as FR-405/FR-406, `GET /certificates/{certificateNumber}/status`, and a `SUPERSEDED` status on the `Certificate` entity, giving Conflict C's resolution an actual mechanism rather than only a policy statement.
-
-**What was checked and rejected:** The competing submission's own 2G-latency arithmetic ("TCP (1 RTT = 600ms) + TLS 1.3 (1 RTT = 600ms) requires 1.8 seconds") does not add up — 600ms + 600ms = 1,200ms, not 1,800ms. Rather than reusing the number, Part C.1 was rewritten with the arithmetic shown correctly: TCP + TLS 1.3 is 2 round trips (1.2s at a 600ms RTT), TCP + TLS 1.2 is 3 round trips (1.8s) — the *idea* of putting a concrete number on the handshake cost was worth keeping; the specific number as originally presented was not.
-
-## Entry 7 — Closing a self-identified verification gap on the diagrams
-
-**Task given:** Refine every part of this dossier that scored below full marks in the graded review, including a noted gap that the C4 diagrams were checked for valid XML but never actually rendered or checked for overlapping elements.
-
-**What was actually checked:** Wrote `scripts/render_drawio_check.py`, a small parser that reads each `.drawio` file's own `mxCell` geometry and style, renders it with matplotlib, and programmatically flags any two boxes that overlap or any edge pointing at a node ID that doesn't exist.
-
-**What was found, and corrected:** The first run of the checker flagged the component diagram's boundary box as "overlapping" every component inside it. Investigating before treating that as a real defect: the checker was ignoring the `verticalAlign=top` style on the boundary's label, so it drew the label centred over the child components instead of at the top of the box, which is not what the actual `style` attribute specifies. The checker was fixed to honour `verticalAlign=top`; re-rendered, the boundary's title sits clear at the top and the reported overlaps were confirmed to be the checker's own earlier bug, not a defect in the diagram. All three diagrams now report zero real overlaps and zero dangling edges — a substantially stronger claim than "the XML parses."
-
-## Entry 8 — Rendering a diagram checker prompted checking the dossier's own rendering the same way
-
-**Task given:** none directly — this followed from the habit Entry 7 established (don't trust that a file "looks right"; render it and look).
-
-**What was actually checked:** Whether the same discipline applied to the *dossier PDF itself*. It hadn't been — every prior visual check happened to land on pages where lists rendered correctly. Rendering the BRD and PRD pages specifically (the two documents an earlier grading pass said needed more depth) surfaced a real bug: in both files, a bold lead-in line (`**In scope:**`, `**Explicitly out of scope for Release 1**...`, `Success is checkable, not aspirational:`) was directly followed by a bulleted list with no blank line between them. `python-markdown` treats that as one paragraph and renders the list as run-on dash-separated text instead of actual bullets — the content was always correct, but it was never visually a list.
-
-**Correction made:** Inserted a blank line between each bold lead-in and its list in `part-a1-brd.md` and `part-a2-prd.md`, then scanned every other dossier file programmatically for the same adjacency pattern (none found) before rebuilding and re-rendering both pages to confirm proper bullets.
-
-## Entry 9 — Table text overflowing column borders, and a dead end on the way to fixing it
-
-**Task given:** Fix two named layout defects: headings separated from their content by a page break, and table text bleeding across column borders (named examples: Part D.4, and Part C.3's "Method, safety, and idempotency" table).
-
-**What was checked:** Zoomed into the flagged tables at high resolution rather than trusting a normal-resolution screenshot. Part C.3's `/schools/{schoolId}/sittings/{sittingId}/results` and Part D.4's `candidate(exam_number)` were genuinely crossing column borders — long, whitespace-free `<code>` tokens were overflowing because reportlab's default word-wrap only breaks at spaces.
-
-**First attempt (rejected):** Set `-pdf-word-wrap: CJK` (a reportlab/xhtml2pdf mode that breaks at any character) on every table cell. This did stop the overflow, but re-rendering plain-prose tables (no code, e.g. the trade-off register) showed it was also breaking ordinary English words mid-syllable ("twic/e", "surna/me") wherever a line happened to end — CJK mode does not prefer whitespace breaks over character breaks, it was fixing the bug by degrading every table's readability, not just the ones with the actual problem.
-
-**Second attempt (also rejected):** Scoped the fix to only `<code>` elements and inserted a zero-width space (U+200B) after `/`, `(`, `,`, `_`, `-` as real break points, keeping normal word-wrap everywhere else. Rebuilding showed every inserted zero-width space rendering as a visible black box — it isn't in the base-14 PDF fonts' encoding (Windows-1252), so reportlab drew a missing-glyph placeholder instead of an invisible break. Checked this the same way the naira symbol and `~` were checked earlier in this project: `chr(0x200B).encode('cp1252')` raises `UnicodeEncodeError`, confirming the character was never going to render correctly in this font, not a one-off rendering glitch.
-
-**What was actually done:** Replaced the zero-width space with a plain space (always in every font's encoding) after the same separator characters, and scoped the whole transform to run only inside `<td>`/`<th>` cells (via a regex pass in `build_dossier.py` after markdown conversion), so body prose referencing the same identifiers outside tables is untouched. Re-rendered every table in the dossier: prose tables wrap at natural word boundaries with no mid-word breaks, code-heavy tables (Part C.3, Part D.4) stay within their column borders, verified at high zoom on the previously-worst rows.
-
-**Separately, for the heading/content fix:** added `-pdf-keep-with-next: true` to h1/h2/h3 in `build_dossier.py`'s CSS, which is the documented xhtml2pdf mechanism for this exact problem. Confirmed by re-rendering: sections that previously risked a heading landing alone at the bottom of a page now move as a unit to the next page. This cost the WBS a page back (see Entry 4's second correction) — an accepted, explained trade-off, not an oversight.
+**Table column overflow — two dead ends, then fixed.** Long `<code>` tokens overflowed table cells since the PDF renderer only wraps at whitespace. First tried character-anywhere wrapping: stopped the overflow but broke ordinary prose mid-word. Then tried an invisible zero-width space after separators: the right idea, but that character isn't in the PDF's font encoding and rendered as a visible box instead. Landed on a plain space after separators, scoped to table cells only, verified at high zoom.
