@@ -65,7 +65,6 @@ ul, ol { margin: 4px 0 8px 18px; padding: 0; }
 li { margin: 2px 0; }
 .titlepage { page-break-after: always; text-align: center; padding-top: 220px; }
 .titlepage h1 { border: none; page-break-before: avoid; font-size: 30pt; }
-.tocpage { page-break-after: always; }
 .tocpage h1 { page-break-before: avoid; }
 .toc-entry { margin: 5px 0; font-size: 11pt; }
 """
