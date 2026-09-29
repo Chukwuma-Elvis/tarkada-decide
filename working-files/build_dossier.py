@@ -102,7 +102,8 @@ def build():
       <h1>Takarda Decision Dossier</h1>
       <p style="font-size:14pt; margin-top:30px;">Architecture and decision record for the Takarda results-checking platform,
       prepared for the National Secondary Certificate Council contract.</p>
-      <p style="font-size:11pt; margin-top:60px; color:#555555;">TeSA Africa &mdash; Assignment: Takarda (Decide)</p>
+      <p style="font-size:12pt; margin-top:40px;">Prepared by Nnaemeka Chukwuma<br/>
+      <span style="font-size:11pt; color:#555555;">TeSA Africa &mdash; Assignment: Takarda (Decide)</span></p>
     </div>
     """)
 

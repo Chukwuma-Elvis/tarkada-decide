@@ -146,6 +146,9 @@ def build_dossier_docx():
         "Architecture and decision record for the Takarda results-checking platform, "
         "prepared for the National Secondary Certificate Council contract."
     )
+    author = doc.add_paragraph()
+    author.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    author.add_run("Prepared by Nnaemeka Chukwuma")
     doc.add_page_break()
 
     doc.add_heading("Contents", level=1)
