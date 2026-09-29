@@ -70,8 +70,10 @@ def render(path, out_path):
 
 if __name__ == "__main__":
     outdir = sys.argv[1] if len(sys.argv) > 1 else "."
+    base = os.path.dirname(os.path.abspath(__file__))
+    diagrams_dir = os.path.join(base, "..", "..", "submission", "repository", "diagrams")
     for name in ["context", "container", "component-read-model"]:
-        src = f"diagrams/{name}.drawio"
+        src = os.path.join(diagrams_dir, f"{name}.drawio")
         out = os.path.join(outdir, f"check_{name}.png")
         overlaps, dangling = render(src, out)
         print(name, "-> overlaps:", overlaps, "dangling edges:", dangling)

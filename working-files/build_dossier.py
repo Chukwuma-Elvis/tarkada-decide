@@ -127,7 +127,7 @@ def build():
     full_html = f"""<html><head><meta charset="utf-8"/><style>{CSS}</style></head>
     <body>{footer}{''.join(body_parts)}</body></html>"""
 
-    out_path = os.path.join(BASE, "Takarda-Decision-Dossier.pdf")
+    out_path = os.path.join(BASE, "..", "submission", "Takarda-Decision-Dossier.pdf")
     with open(out_path, "wb") as out_file:
         result = pisa.CreatePDF(src=full_html, dest=out_file)
 

@@ -17,7 +17,7 @@ def build():
         text = f.read()
     html_fragment = markdown.markdown(text, extensions=["tables", "sane_lists"])
     full_html = f"<html><head><meta charset='utf-8'/><style>{CSS}</style></head><body>{html_fragment}</body></html>"
-    out_path = os.path.join(BASE, "One-Page-Summary.pdf")
+    out_path = os.path.join(BASE, "..", "submission", "One-Page-Summary.pdf")
     with open(out_path, "wb") as out_file:
         result = pisa.CreatePDF(src=full_html, dest=out_file)
     print("ERR" if result.err else "OK", out_path)
