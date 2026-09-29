@@ -1,3 +1,5 @@
 __pycache__/
 *.pyc
 working-files
+*.docx
+working-files/
